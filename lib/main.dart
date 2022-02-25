@@ -1,26 +1,33 @@
 
 
+import 'dart:async';
 
+/// Future까지 했고
+/// async/wait 할차례
+/// async 안에 await를 거는 방법들
+/// 1. await null
+/// 2. completer
+/// 3. Future() 기본 생성자
+/// Future의 여러가지 생성자들 알아보기
 
 void main() async {
-  void counter() async{
+
+
+  Future<void> counter() async{
     int count = 3;
     for (int c = 0; c < count; c++) {
-      for (int i = 0; i < 1000000; i++) {
-        for (int j = 0; j < 10000; j++) {
+      for (int i = 0; i < 100000; i++) {
+        for (int j = 0; j < 15000; j++) {
           100000 * 100;
         }
       }
       print("count:$c");
     }
   }
-
+    Timer(Duration(seconds: 3), (){print('timer');});
   print('ready');
 
-  counter();
-
   print('end');
-
   // initializeReflectable();
   // UserR r = UserR();
   // r.a();
