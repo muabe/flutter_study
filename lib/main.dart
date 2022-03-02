@@ -11,7 +11,7 @@ import 'dart:async';
 /// Future의 여러가지 생성자들 알아보기
 
 void main() async {
-
+  print('ready');
 
   Future<void> counter() async{
     int count = 3;
@@ -24,8 +24,7 @@ void main() async {
       print("count:$c");
     }
   }
-    Timer(Duration(seconds: 3), (){print('timer');});
-  print('ready');
+  Timer(Duration(seconds: 3), (){print('timer');});
 
   print('end');
   // initializeReflectable();
