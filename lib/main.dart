@@ -2,29 +2,66 @@
 
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+
 
 Stream<int> stm(int count) async*{
   yield count;
 }
 
-Stream<int> stm2(int count) async*{
-  yield count;
+class A{
+  late String a;
+  void aA(){
+    a = "";
+  }
+
+}
+void main() async{
+  runApp(MyApp());
 }
 
-void main() async{
-  print('ready');
-  StreamController<int> streamController = StreamController<int>();
-  streamController.stream.listen((event) => print('listen:$event'));
-  streamController.add(3);
-  streamController.sink.add(3);
-  streamController.addStream(stm(4));
-  // int input = 1;
-  // stm(input).listen((event) => print('listen:$event'));
-  // input = 2;
-  // stm(input).listen((event) => print('listen:$event'));
-  // input = 3;
-  // stm(input).listen((event) => print('listen:$event'));
-  print('end');
+class MyApp extends StatelessWidget{
+  @override
+  Widget build(BuildContext context) {
+    StreamController<String> con = StreamController<String>();
+    con.onListen = ()=>print('onListen');
+
+
+    return MaterialApp(
+      home: Scaffold(body:
+          Center(
+            child: StreamBuilder(stream: con.stream,
+                builder: (context,  snapshot){
+                  String msg = "msg";
+                  if(snapshot.connectionState == ConnectionState.none){
+                    print('none');
+                    msg = 'none';
+                  }else if(snapshot.connectionState == ConnectionState.waiting){
+                    print('waiting');
+                    msg = 'waiting';
+                  }else if(snapshot.connectionState == ConnectionState.active){
+                    print('active');
+                    msg = 'active';
+                  }else if(snapshot.connectionState == ConnectionState.done){
+                    print('done');
+                    msg = 'done';
+                  }else{
+                    print('else');
+                    msg = 'else';
+                  }
+                  return InkWell(
+                      child: Text(msg),
+                      onTap: (){
+                        con.sink.add('hi');
+                      }
+                  );
+                 }
+            )
+          )
+        )
+    );
+  }
 }
 
 
