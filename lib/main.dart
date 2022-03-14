@@ -1,91 +1,175 @@
+import 'dart:collection';
+import 'dart:math';
 
-
-import 'dart:async';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-
-Stream<int> stm(int count) async*{
-  yield count;
-}
-
-class A{
-  late String a;
-  void aA(){
-    a = "";
-  }
-
-}
-void main() async{
+void main() {
   runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget{
+class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    StreamController<String> con = StreamController<String>();
-    con.onListen = ()=>print('onListen');
-
-
     return MaterialApp(
-      home: Scaffold(body:
-          Center(
-            child: StreamBuilder(stream: con.stream,
-                builder: (context,  snapshot){
-                  String msg = "msg";
-                  if(snapshot.connectionState == ConnectionState.none){
-                    print('none');
-                    msg = 'none';
-                  }else if(snapshot.connectionState == ConnectionState.waiting){
-                    print('waiting');
-                    msg = 'waiting';
-                  }else if(snapshot.connectionState == ConnectionState.active){
-                    print('active');
-                    msg = 'active';
-                  }else if(snapshot.connectionState == ConnectionState.done){
-                    print('done');
-                    msg = 'done';
-                  }else{
-                    print('else');
-                    msg = 'else';
-                  }
-                  return InkWell(
-                      child: Text(msg),
-                      onTap: (){
-                        con.sink.add('hi');
-                      }
-                  );
-                 }
-            )
-          )
-        )
+      home: Scaffold(
+        body: Center(
+          child: Container(
+            width: 300,
+            height: 300,
+            color: Color(0x36B8F4FF),
+            child: InkWell(
+              onTap: Eventor().before(method: (eventor){
+                print("before1");
+              }).before(method: (eventor){
+                print("before2");
+              }).after(method: (eventor){
+                print("after1");
+              }).after(method: (eventor){
+                print("after2");
+              }).logProperty("log", "custom log")
+                .action((eventor) {
+                print('action');
+              }),
+              child: Text('click'),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
 
 
-// void delay(int count , String msg){
-//   for (int c = 1; c <= count; c++) {
-//     for (int i = 0; i < 100000; i++) {
-//       for (int j = 0; j < 15000; j++) {
-//         100000 * 100;
-//       }
-//     }
-//     print('$msg:$c');
-//   }
-// }
-//
-// Future<void> futureDelay({String msg = 'future'}) async{
-//   await Future((){
-//     delay(3, msg);
-//   });
-// }
-//
-// void main() async{
-//   print('ready');
-//   futureDelay(msg:'future1'); //1번
-//   print('end');
-// }
-// futureDelay(msg:'future2'); //2번
-// delay(3, 'code'); //3번
+enum EventJob {
+  Test,
+  GA,
+  FILE_LOG
+}
+
+class Eventor {
+  final LinkedHashMap<EventJob, Function> _eventJob = LinkedHashMap<EventJob, Function>();
+  final LinkedHashMap<String, Function> _beforeList = LinkedHashMap<String, Function>();
+  final LinkedHashMap<String, Function> _afterList = LinkedHashMap<String, Function>();
+  final Map<String, String> _logMap = {};
+  late final void Function(Eventor eventor) _event;
+  final _chars = 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
+  final Random _rnd = Random();
+
+  Eventor({Eventor? extend}) {
+    if (extend != null) {
+      _beforeList.addAll(extend._beforeList);
+      _afterList.addAll(extend._afterList);
+      _logMap.addAll(extend._logMap);
+    }
+    initEventJob();
+  }
+
+  /// 디폴트 작업을 여기서 정의
+  Eventor initEventJob() {
+    _eventJob.clear();
+
+    _eventJob[EventJob.Test] = () => print('test');
+    _eventJob[EventJob.GA] = () => print('ga');
+    _eventJob[EventJob.FILE_LOG] = () => print('file write');
+
+    return this;
+  }
+
+  String _getRandomString(int length) => String.fromCharCodes(
+      Iterable.generate(length, (_) => _chars.codeUnitAt(
+          _rnd.nextInt(_chars.length))
+      )
+  );
+
+  Eventor _aopMethod(LinkedHashMap<String, Function> map, {String id = "", required void Function(Eventor) method}){
+    if (id.isEmpty) {
+      id = _getRandomString(10);
+    }
+    map[id] = method;
+    return this;
+  }
+
+  Eventor before({String id = "", required void Function(Eventor) method}) {
+    return _aopMethod(_beforeList, id: id, method: method);
+  }
+
+  Eventor removeBeforeAt(int index) {
+    return removeBfeforId(_beforeList.keys.toList()[index]);
+  }
+
+  Eventor removeBfeforId(String id) {
+    _beforeList.remove(id);
+    return this;
+  }
+
+  Eventor after({String id = "", required void Function(Eventor) method}) {
+    return _aopMethod(_afterList, id: id, method: method);
+  }
+
+  Eventor removeAfterAt(int index) {
+    return removeBfeforId(_afterList.keys.toList()[index]);
+  }
+
+  Eventor removeAfterId(String id) {
+    _afterList.remove(id);
+    return this;
+  }
+
+  void Function() action(void Function(Eventor eventor) method) {
+    _event = method;
+    return _action;
+  }
+
+  void _action() {
+    print('____선행작업___________');
+    _beforeList.forEach((key, method) {
+      method(this);
+    });
+    print('_____액션처리__________');
+    _event(this);
+    print('_____이후작업__________');
+    _afterList.forEach((key, method) {
+      method(this);
+    });
+    print('_____로그기록__________');
+    _logMap.forEach((key, value) {
+      print("log = $key:$value");
+    });
+    print('_____자동수행__________');
+    _eventJob.forEach((key, method) {
+      method();
+    });
+  }
+
+  Eventor logProperty(String key, String value) {
+    _logMap[key] = value;
+    return this;
+  }
+
+  Eventor logMap(Map<String, String> map) {
+    _logMap.addAll(map);
+    return this;
+  }
+
+  void cancel(EventJob eventJob){
+    _eventJob.remove(eventJob);
+  }
+
+  void clearBefore(){
+    _beforeList.clear();
+  }
+
+  void clearAfter(){
+    _afterList.clear();
+  }
+
+  void clearLog(){
+    _logMap.clear();
+  }
+
+  void clear(){
+    clearBefore();
+    clearAfter();
+    clearLog();
+  }
+}

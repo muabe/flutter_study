@@ -1,3 +1,5 @@
+import 'package:study/main.dart';
+
 void global1(){
   print("global1");
 }
