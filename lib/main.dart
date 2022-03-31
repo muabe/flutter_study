@@ -1,175 +1,167 @@
-import 'dart:async';
 
+import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:study/remoteconfig.dart';
 
-
-Future<String> fu() async{
-  await Future.delayed(Duration(seconds: 3));
-  return "hi";
+void main(){
+  runApp(MyApp());
 }
 
-class A{
-
-  Future<String> _a = Future.value("init");
-
-  Future<String> get a{
-    return Future.value("33");
-  }
-
-  set a(Future<String> s){
-    _a = s;
-  }
-
-
-  void set(Future<String> field, String value){
-    field = Future.value(value);
-  }
-
-}
-
-void main() async{
-
-  A a = A();
-  print('ready');
-  a.set(a.a, "okok");
-  String ok = await a.a;
-  print(ok);
-  print('end');
-  // runApp(MyApp());
-}
-
-class BankAccount with ChangeNotifier {
-  int _balance = 0;
-
-  int getBalance() => _balance;
-
-  void increment(int value) {
-    _balance += value;
-    notifyListeners(); //must be inserted
-  }
-
-  void decrement(int value) {
-    _balance -= value;
-    notifyListeners(); //must be inserted
-  }
-}
-
-class MyApp extends StatefulWidget {
-  @override
-  State<MyApp> createState() {
-    return My();
-  }
-}
-
-class My extends State<MyApp> {
-
-  Future<String> fu() async{
-    await Future.delayed(Duration(seconds: 5));
-    return "good";
-  }
-
-  Stream<String> stm() async*{
-    for(int i=0;i<10;i++){
-      await Future.delayed(Duration(seconds: 2));
-      yield "$i";
-    }
-  }
-  late Future<String> future;
-
-  var st;
-
-  @override
-  void initState() {
-    future = fu();
-    st = stm();
-    super.initState();
-  }
-
+class MyApp extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 300,
-      height: 300,
-      child: MaterialApp(
-        home: Scaffold(
-          body: Container(
-            color: Colors.blue,
-            child: MultiProvider(
-              providers: [
-                ChangeNotifierProvider<BankAccount>(
-                    create: (context) => BankAccount(),
-                ),
-                StreamProvider<String>(create: (context) => st, initialData: "hi")
-              ],
-              child: SimplePage(),
-            )
-          ),
-        ),
+    return MaterialApp(
+      home: Scaffold(
+        body: HomePage(),
       ),
     );
   }
 }
 
-class SimplePage extends StatelessWidget {
+class HomePage extends HookWidget{
+  late FirebaseRemoteConfig remoteConfig;
+
+  @override
+  Widget build(BuildContext context){
+    return BlocProvider<TestBloc>(
+     create: (_) => TestBloc()..add(TestEvent.start()),
+      child: BlocBuilder<TestBloc, TestState>(
+        builder: (context, state){
+            return Contain(state);
+        }
+      ),
+    );
+  }
+
+}
+
+class Contain extends HookWidget{
+  TestState state;
+  Contain(this.state);
+
   @override
   Widget build(BuildContext context) {
-    BankAccount b = Provider.of<BankAccount>(context);
-    String hi = Provider.of<String>(context);
-    return Center(
-        child: InkWell(
-      child: Text('${Provider.of<BankAccount>(context).getBalance()}:$hi'),
-      onTap: () {
-        b.increment(10);
-      },
-    ));
+
+    print("build2");
+    return Container( height: 300, width: 300, color: Colors.red, alignment: Alignment.center,
+        child : InkWell(
+          child : getText(context),
+          onTap: () {
+              // context.read<TestBloc>().add(TestEvent.start());
+          }
+        )
+    );
+
+  }
+
+  Widget getText(BuildContext context){
+    String msg = 'noting';
+    print('state:${context.read<TestBloc>().state.state}');
+    if(context.read<TestBloc>().state.state == 2){
+      msg = context.read<TestBloc>().state.data;
+    }
+    return Text('$msg, hi${state.data}');
   }
 }
-//
-// class MyApp extends StatelessWidget {
-//   Color? color = Colors.red;
-//
-//   Future<Color> _future() async {
-//     await Future.delayed(Duration(seconds: 3));
-//     return Colors.black;
-//   }
-//
-//   late Future<Color> future;
-//
-//   MyApp() {
-//     future = _future();
-//   }
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return MaterialApp(
-//       home: Scaffold(
-//         body: Center(
-//           child: FutureBuilder<Color>(
-//             future: future,
-//             builder: (context, snapshot) {
-//               if (snapshot.connectionState == ConnectionState.none) {
-//                 print('none');
-//               } else if (snapshot.connectionState == ConnectionState.waiting) {
-//                 print('waiting');
-//               } else if (snapshot.connectionState == ConnectionState.active) {
-//                 print('active'); // never called
-//               } else if (snapshot.connectionState == ConnectionState.done) {
-//                 print('done');
-//                 color = snapshot.data;
-//               }
-//               return InkWell(
-//                 child: Container(
-//                   width: 300,
-//                   height: 300,
-//                   color: color,
-//                 ),
-//                 onTap: () {},
-//               );
-//             },
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-// }
+
+
+//state에 모델을 저장해두고
+class TestState{
+  late int state;
+  String data = "";
+
+  TestState(this.state, this.data);
+
+  factory TestState.init(String data){
+    return TestState(0, data);
+  }
+
+  factory TestState.loading(String data){
+    return TestState(1, data);
+  }
+
+  factory TestState.loaded(data){
+    return TestState(2, data);
+  }
+
+}
+
+
+class TestEvent{
+  int eventNum = 0;
+  TestEvent(this.eventNum);
+
+
+  factory TestEvent.start(){
+    print("스타트다");
+    return TestEvent(1);
+  }
+
+  @override
+  bool operator == (Object other) {
+    if(other is TestEvent){
+      return eventNum == other.eventNum;
+    }else{
+      return false;
+    }
+  }
+}
+
+class TestBloc extends Bloc<TestEvent, TestState>{
+  TestBloc() : super(TestState.init("시작")){
+    on<TestEvent>(load);
+  }
+
+  Future<void> load(TestEvent event, emit) async{
+    print("load다");
+    if(event.eventNum == 1) {
+      emit(TestState.loading("로딩11"));
+      print('loading');
+      RemoteConfigRepository configRepository = RemoteConfigRepositoryImpl(DefaultIntervalRepositoryImpl());
+      Future.delayed(Duration(seconds: 3));
+      await configRepository.initRemoteConfig();
+      emit(TestState.loaded(configRepository.getString("ok")));
+      print('loaded');
+    }
+  }
+
+}
+
+class TestModel{
+  String name;
+  int age;
+  TestModel(this.name, this.age);
+}
+
+class MdEvent{
+  MdEvent create(){
+    return this;
+  }
+}
+
+class Ev extends MdEvent{
+
+  @override
+  MdEvent create() {
+
+    return super.create();
+  }
+}
+
+class MdState{
+
+}
+
+class Bl<Ev, MdState> extends MdBloc{
+  Bl(initialState) : super(initialState);
+
+}
+
+class MdBloc<Event extends MdEvent, State> extends Bloc<Event, State>{
+  MdBloc(State initialState) : super(initialState){
+    add((MdEvent().create()) as Event);
+  }
+
+}

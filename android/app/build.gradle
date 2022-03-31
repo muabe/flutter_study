@@ -39,6 +39,7 @@ android {
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
+        multiDexEnabled true
     }
 
     buildTypes {
@@ -49,6 +50,12 @@ android {
         }
     }
 }
+
+//rootProject.ext {
+//    set('FlutterFire', [
+//            FirebaseSDKVersion: '29.0.4'
+//    ])
+//}
 
 flutter {
     source '../..'
