@@ -1,12 +1,8 @@
 import 'package:native_shared_preferences/native_shared_preferences.dart';
 
 class PreferencesRepositoryImpl {
-  static final PreferencesRepositoryImpl instance = PreferencesRepositoryImpl._();
+  static final PreferencesRepositoryImpl instance = PreferencesRepositoryImpl();
   final Map<String, dynamic> _cache = {};
-
-  PreferencesRepositoryImpl._(){
-
-  }
 
   factory PreferencesRepositoryImpl(){
     return instance;
@@ -46,7 +42,6 @@ class PreferencesRepositoryImpl {
   // Get data by key
   Future<T?> getData<T>(String key) async {
     if(_cache.containsKey(key)){
-      print("cache!!!");
       return Future<T?>.value(_cache[key]);
     }
 
