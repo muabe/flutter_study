@@ -6,7 +6,7 @@ class InheritedWidgetHome extends StatelessWidget{
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(),
-        body: Inherited(child: SampleHome(),)
+        body: InheritedWidgetEx(child: SampleHome(),)
       ),
     );
   }
@@ -49,7 +49,7 @@ class SampleHome extends StatelessWidget{
 class Inherited extends StatelessWidget{
   String share = "공유";
   Widget child;
-  Inherited({required this.child});
+  Inherited({Key? key, required this.child}) : super(key: key);
 
 
   @override
@@ -62,7 +62,7 @@ class Inherited extends StatelessWidget{
 class InheritedWidgetEx extends InheritedWidget{
   String share = "공유 데이터";
 
-  InheritedWidgetEx({required Widget child}) : super(
+  InheritedWidgetEx({Key? key, required Widget child}) : super(key: key,
       child: child,
   );
 

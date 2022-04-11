@@ -17,4 +17,8 @@ class PartSub{
     print(PartBase()._privateBase);
     print(PartBase()._getPrivateBase());
   }
+
+  void share(){
+    SharedPreferences.getInstance();
+  }
 }

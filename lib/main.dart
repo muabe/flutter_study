@@ -1,7 +1,15 @@
-import 'package:flutter/cupertino.dart';
-import 'package:study/example/inherited_widget/inherited_widget_ex.dart';
+import 'package:study/example/part_keyword/import_sub.dart';
+import 'package:study/example/part_keyword/part_base.dart';
 
 void main() {
-  runApp(InheritedWidgetHome());
+  PartBase partBase = PartBase();
+  PartSub partSub = PartSub();
+
+  partBase.printMsg();
+  print("-------------------");
+  partSub.printMsg();
+  print("-------------------");
+
+
 }
 
