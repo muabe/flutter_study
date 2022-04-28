@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:reflectable/mirrors.dart';
-import 'package:study/reflect.dart';
+import 'package:study/example/reflect/reflect.dart';
 
 
 typedef Op<X> = String Function(List<X>);

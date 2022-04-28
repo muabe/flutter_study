@@ -1,4 +1,4 @@
-import 'package:study/global1.dart';
+import 'package:study/example/call/global1.dart';
 
 void global2(){
   print("global2");

@@ -35,6 +35,5 @@ class Reflector{
     // print(classMirror.invoke('optionalArguments', [21, 21, 0, 'foo']));
     // print(classMirror.invoke('namedArguments', [55, 29]));
     // print(classMirror.invoke('namedArguments', [21, 21], {#z: 0}));
-
   }
 }
