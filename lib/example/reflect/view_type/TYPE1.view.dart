@@ -9,14 +9,3 @@ class TYPE1 with Viewer{
 }
 
 
-mixin Viewer{
-  late String ok;
-
-  void draw(){
-    print('drawqweqweqweqwe');
-  }
-
-  void draw5(){
-    print('55555555555');
-  }
-}

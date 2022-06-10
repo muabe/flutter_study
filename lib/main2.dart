@@ -1,13 +1,13 @@
+
+
 import 'package:reflectable/mirrors.dart';
 
-// import '../../main.reflectable.dart';
-import 'bloc/bloc_reflector.dart';
-
+import 'example/reflect/bloc/bloc_reflector.dart';
+import 'main.reflectable.dart';
 
 void main(){
-  // initializeReflectable();
-  print("start");
-
+  print('start');
+  initializeReflectable();
 
   print("- 해당 어노테이션이 걸린 클래스 전부찾기 찾기");
   BlocEvent.annotatedClasses.forEach((ClassMirror element) {
@@ -35,7 +35,6 @@ void main(){
   });
 }
 
-
 @BlocEvent
 @ClassAnnotation("ccc")
 class Test{
@@ -48,6 +47,8 @@ class Test{
     print('$a');
   }
 }
+
+
 
 class ClassAnnotation{
   final String? ok;
@@ -76,6 +77,8 @@ class FieldAnotation{
     print("필드1");
   }
 }
+
+
 
 void test(){
   // initializeReflectable();

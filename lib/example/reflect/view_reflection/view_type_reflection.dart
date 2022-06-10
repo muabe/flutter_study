@@ -1,6 +1,5 @@
 import 'package:reflectable/reflectable.dart';
 
-import '../../../main.reflectable.dart';
 
 
 class Reflector extends Reflectable {
@@ -13,7 +12,7 @@ class Reflector extends Reflectable {
 const Reflection = Reflector();
 
 void initReflection(){
-  initializeReflectable();
+
   Reflector.viewTypeMap.clear();
 
 
@@ -33,3 +32,17 @@ void viewTypeMapper(String viewTypeName, String corner){
     print("object = null");
   }
 }
+
+mixin Viewer{
+  late String ok;
+
+  void draw(){
+    print('drawqweqweqweqwe');
+  }
+
+  void draw5(){
+    print('55555555555');
+  }
+}
+
+void main(){}

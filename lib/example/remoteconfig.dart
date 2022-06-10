@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 
 class RemoteConfigRepositoryImpl implements RemoteConfigRepository{
   final RemoteConfigIntervalRepository _intervalRepository;
@@ -50,4 +53,25 @@ class DefaultIntervalRepositoryImpl implements RemoteConfigIntervalRepository{
 abstract class RemoteConfigRepository{
   Future<void> initRemoteConfig();
   String getString(String key);
+}
+
+
+class EventLogger{
+  static EventLogger instance = EventLogger();
+  EventLogger();
+
+  int startTime = 0;
+  String os = Platform.isAndroid ? "Android" : "iOS";
+  String version = "";
+  String flavor = "";
+
+  Future<void> loagingTime() async{
+    await FirebaseAnalytics.instance.logEvent(
+      name: "loading_time",
+      parameters: {
+        "time": startTime - DateTime.now().millisecond+1000,
+        "flavor": flavor,
+      },
+    );
+  }
 }
